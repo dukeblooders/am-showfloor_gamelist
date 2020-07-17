@@ -135,11 +135,15 @@ local snap = Snap(snapargs, snaprect)
 //******************************************************************************
 // Callbacks
 //******************************************************************************
+
+local current_ttime = 0
 function ticks_callback(ttime)
 {
+	current_ttime = ttime
+
 	listbox.scroll()
 	overview.scroll(ttime)
-	snap.initswap()
+	snap.swap(ttime)
 }
 
 function transition_callback(ttype, var, ttime) 
@@ -149,7 +153,7 @@ function transition_callback(ttype, var, ttime)
 		case Transition.ToNewSelection:
 			listbox.change(var)
 			overview.reset(var)
-			snap.reset()
+			snap.reset(current_ttime)
 			break
 	
 		case Transition.ToNewList:		
@@ -157,11 +161,7 @@ function transition_callback(ttype, var, ttime)
 			updateGameCount()
 			listbox.change(var)
 			overview.reset(var)
-			snap.reset()
-			break
-			
-		case Transition.ToGame:
-			snap.clear()
+			snap.reset(current_ttime)
 			break
 			
 		case Transition.FromGame:

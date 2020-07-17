@@ -11,6 +11,7 @@ class OverviewArgs
 	controlpath = ""			// Use %s for current list
 	input_up = "custom1"
 	input_down = "custom2"
+	input_swap = "custom3"
 }
 
 
@@ -20,19 +21,14 @@ class OverviewArgs
 class Overview
 {
 	args = null
-	rectangle = null
-
-	line = null
-	overview = null
-	controls = null
-	
+	line = null; overview = null; image = null
+	swapmode = false
 	previoustick = 0
 
 
-	constructor(_args, _rectangle,)
+	constructor(_args, rectangle)
 	{
 		args = _args
-		rectangle = _rectangle
 	
 		overview = fe.add_text("[Overview]", rectangle.x, rectangle.y, rectangle.width, rectangle.height)
 		overview.word_wrap = true
@@ -40,27 +36,47 @@ class Overview
 		overview.charsize = args.charsize
 		overview.margin = args.margin
 			
+		image = PreserveImage("", rectangle.x, rectangle.y, rectangle.width, rectangle.height)
+			
 		reset(0)
 	}
 	
 
 	function reset(var)
 	{
-		if (controls != null)
+		if (swapmode)
 		{
-			controls.art.visible = false
-			controls = null
-		}
-		
-		if (overview.msg == "[Overview]") // Overview not found
-		{	
-			local path = format(args.controlpath, fe.game_info(Info.Buttons, var), fe.game_info(Info.Name, var))
+			local flyerpath = fe.get_art("flyer", var)
 			
-			controls = PreserveImage(path, rectangle.x, rectangle.y, rectangle.width, rectangle.height)
-			controls.update()
+			if (flyerpath != "")
+			{
+				overview.visible = false
+				setImagePath(flyerpath)
+				return
+			}	
 		}
 
-		resetOverview()
+		if (overview.msg_width == 0)
+		{
+			local controlpath = format(args.controlpath, fe.game_info(Info.Buttons, var), fe.game_info(Info.Name, var))
+
+			setImagePath(controlpath)
+		}	
+		else
+		{
+			overview.visible = true
+			image.art.visible = false
+			
+			resetOverview()
+		}
+	}
+	
+	function setImagePath(path)
+	{
+		image.art.file_name = path
+		image.update()
+			
+		image.art.visible = true
 	}
 	
 	
@@ -73,25 +89,39 @@ class Overview
 
 	function scroll(ttime)
 	{
-		if (ttime > previoustick + args.scroll_mindelay)
-			if (fe.get_input_state(args.input_up))
+		if (fe.get_input_state(args.input_swap))
+		{
+			if (ttime > previoustick + 400)
 			{
-				overview.first_line_hint = line--
+				swapmode = !swapmode
+				reset(0)
+				
 				previoustick = ttime
+				return
 			}
-			else if (fe.get_input_state(args.input_down))
-			{
-				overview.first_line_hint = line++
-			
-				if (overview.msg_width == 0)
+		}
+		else 
+		{
+			if (ttime > previoustick + args.scroll_mindelay)
+				if (fe.get_input_state(args.input_up))
 				{
-					if (overview.first_line_hint == 0)
-						overview.first_line_hint = -1
-				
-					resetOverview()
+					overview.first_line_hint = line--
+					previoustick = ttime
 				}
+				else if (fe.get_input_state(args.input_down))
+				{
+					overview.first_line_hint = line++
 				
-				previoustick = ttime
-			}
+					if (overview.msg_width == 0)
+					{
+						if (overview.first_line_hint == 0)
+							overview.first_line_hint = -1
+					
+						resetOverview()
+					}
+					
+					previoustick = ttime
+				}
+		}
 	}
 }

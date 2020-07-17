@@ -3,8 +3,8 @@
 //******************************************************************************
 class SnapArgs
 {
-	loaddelay = 5		// Delay before image/video load
-	swapdelay = 200		// Delay before image/video swap (100 = ~1 second)
+	loaddelay = 250			// Delay before image load
+	swapdelay = 2000		// Delay before video swap
 }
 
 
@@ -13,14 +13,15 @@ class SnapArgs
 //******************************************************************************
 class Snap
 {
-	args = null; rectangle = null
+	args = null
 	image = null; imagepath = null
-	currentloaddelay = 0; currentswapdelay = 0
+	previousload = 0; previousswap = 0
 	
-	constructor(_args, _rectangle)
+	constructor(_args, rectangle)
 	{
 		args = _args
-		rectangle = _rectangle
+		
+		image = PreserveImage("", rectangle.x, rectangle.y, rectangle.width, rectangle.height)
 	}
 	
 	
@@ -28,71 +29,49 @@ class Snap
 	{
 		imagepath = fe.get_art("snap", 0, 0, 1) // 1:ImageOnly
 
-		image = PreserveImage(imagepath, rectangle.x, rectangle.y, rectangle.width, rectangle.height)
+		image.art.file_name = imagepath
 		image.update()
+		image.art.visible = true
 	}	
 	
-	
-	// Delayed load
-	function initswap()
-	{
-		if (currentloaddelay > args.loaddelay)
-			swap()
-		else if (currentloaddelay < args.loaddelay)
-			currentloaddelay++
-		else
-		{
-			init()
-			currentloaddelay++
-		}
-	}
-
 
 	// Swap from image to video, if exists
-	function swap()
+	function swap(ttime)
 	{
-		if (image == null)
-			return
-			
-		if (currentswapdelay < args.swapdelay)
-			currentswapdelay++
-		else if (currentswapdelay == args.swapdelay)
+		if (previousload == -1)
 		{
-			local videopath = fe.get_art("snap") // Image or video
-		
-			if (videopath != imagepath)
-			{
-				clear()
-
-				image = PreserveImage(videopath, rectangle.x, rectangle.y, rectangle.width, rectangle.height)
-				image.update()
-			}
-			
-			currentswapdelay++
+			if (previousswap != -1)
+				if (ttime > previousswap + args.swapdelay)
+				{
+					local videopath = fe.get_art("snap") // Image or video
+				
+					if (videopath != imagepath)
+					{
+						image.art.file_name = videopath
+						image.art.video_playing = true
+						image.update()
+					}
+					
+					previousswap = -1
+				}
+		}
+		else if (ttime > previousload + args.loaddelay)
+		{
+			previousload = -1
+			previousswap = ttime
+			init()
 		}
 	}
 	
 	
-	function clear()
-	{		
-		image.art.video_playing = false
-		image.art.visible = false
-		image.art = null
-	
-		image.surface.visible = false
-		image.surface = null
-		
-		image = null
-		imagepath = null
-	}
-	
-	
-	function reset()
+	function reset(ttime)
 	{
 		if (image != null)
-			clear()
+		{
+			image.art.video_playing = false
+			image.art.visible = false
+		}
 		
-		currentloaddelay = 0
-		currentswapdelay = 0
+		previousload = ttime
 	}
 }
