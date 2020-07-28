@@ -48,35 +48,25 @@ class Overview
 		{
 			local flyerpath = fe.get_art("flyer", var)
 			
-			if (flyerpath != "")
-			{
-				overview.visible = false
-				setImagePath(flyerpath)
-				return
-			}	
+			setImagePath(flyerpath == "" ? "backgrounds/noimage.png" : flyerpath)
+			
+			overview.visible = false
 		}
-
-		if (overview.msg_width == 0)
-		{
-			local controlpath = format(args.controlpath, fe.game_info(Info.Buttons, var), fe.game_info(Info.Name, var))
-
-			setImagePath(controlpath)
-		}	
 		else
 		{
+			local controlpath = format(args.controlpath, fe.game_info(Info.Buttons, var), fe.game_info(Info.Name, var))
+		
+			setImagePath(controlpath)
+		
 			overview.visible = true
-			image.art.visible = false
-			
-			resetOverview()
 		}
 	}
+	
 	
 	function setImagePath(path)
 	{
 		image.art.file_name = path
 		image.update()
-			
-		image.art.visible = true
 	}
 	
 	
