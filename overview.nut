@@ -60,6 +60,8 @@ class Overview
 		
 			overview.visible = true
 		}
+		
+		resetOverview()
 	}
 	
 	
