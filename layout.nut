@@ -55,8 +55,8 @@ listbox.init(0)
 //******************************************************************************
 // Game count
 //******************************************************************************
-local gamecount = fe.add_text("", flw * 0.029, flh * 0.914, flw * 0.21, flh * 0.06)
-gamecount.charsize = resize(26)
+local gamecount = fe.add_text("", flw * 0.029, flh * 0.927, flw * 0.21, flh * 0.025)
+gamecount.charsize = resize(22)
 
 function updateGameCount()
 {
