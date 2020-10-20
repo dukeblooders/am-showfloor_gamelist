@@ -44,17 +44,18 @@ function updatePlatform()
 //******************************************************************************
 // Listbox
 //******************************************************************************
-local listbox = ListBox(Rectangle(flw * 0.029, flh * 0.23, flw * 0.21, flh * 0.654))
-listbox.rows = 20
+local listbox = ListBox(Rectangle(flw * 0.029, flh * 0.2, flw * 0.21, flh * 0.7))
+listbox.rows = 22
 listbox.charsize = resize(22)
 listbox.sel_color = Color(255, 40, 40, 255)
 listbox.sel_bgcolor = Color(0, 0, 0, 0)
 listbox.init(0)
 
+
 //******************************************************************************
 // Game count
 //******************************************************************************
-local gamecount = fe.add_text("", flw * 0.029, flh * 0.94, flw * 0.21, flh * 0.06)
+local gamecount = fe.add_text("", flw * 0.029, flh * 0.914, flw * 0.21, flh * 0.06)
 gamecount.charsize = resize(26)
 
 function updateGameCount()
@@ -66,13 +67,13 @@ function updateGameCount()
 //******************************************************************************
 // Game logo
 //******************************************************************************
-PreserveArt("wheel", flw * 0.286, flh * 0.05, flw * 0.685, flh * 0.14).update()
+PreserveArt("wheel", flw * 0.286, flh * 0.05, flw * 0.685, flh * 0.2).update()
 
 
 //*****************************************************************************
 // Developper
 //******************************************************************************
-local text = fe.add_text("[Manufacturer]", flw * 0.286, flh * 0.865, flw * 0.207, flh * 0.025)
+local text = fe.add_text("[Manufacturer]", flw * 0.286, flh * 0.927, flw * 0.207, flh * 0.025)
 text.align = Align.Left
 text.charsize = resize(20)
 text.margin = 0
@@ -81,7 +82,7 @@ text.margin = 0
 //*****************************************************************************
 // Genre
 //******************************************************************************
-text = fe.add_text("[Category]", flw * 0.371, flh * 0.865, flw * 0.36, flh * 0.025)
+text = fe.add_text("[Category]", flw * 0.371, flh * 0.927, flw * 0.36, flh * 0.025)
 text.align = Align.Right
 text.charsize = resize(20)
 text.margin = 0
@@ -90,7 +91,7 @@ text.margin = 0
 //*****************************************************************************
 // Players
 //******************************************************************************
-text = fe.add_text("[Players]", flw * 0.774, flh * 0.865, flw * 0.1, flh * 0.025)
+text = fe.add_text("[Players]", flw * 0.774, flh * 0.927, flw * 0.1, flh * 0.025)
 text.align = Align.Left
 text.charsize = resize(20)
 text.margin = 0
@@ -99,7 +100,7 @@ text.margin = 0
 //*****************************************************************************
 // Languages
 //******************************************************************************
-text = fe.add_text("[Language]", flw * 0.81, flh * 0.865, flw * 0.1, flh * 0.025)
+text = fe.add_text("[Language]", flw * 0.81, flh * 0.927, flw * 0.1, flh * 0.025)
 text.charsize = resize(20)
 text.margin = 0
 
@@ -107,7 +108,7 @@ text.margin = 0
 //*****************************************************************************
 // Year
 //******************************************************************************
-text = fe.add_text("[Year]", flw * 0.94, flh * 0.865, flw * 0.03, flh * 0.025)
+text = fe.add_text("[Year]", flw * 0.94, flh * 0.927, flw * 0.03, flh * 0.025)
 text.align = Align.Right
 text.charsize = resize(20)
 text.margin = 0
@@ -120,7 +121,7 @@ local overviewargs = OverviewArgs()
 overviewargs.charsize = resize(20)
 overviewargs.controlpath = "../../../Roms/%s/media/controls/%s.png"
 
-local overviewrect = Rectangle(flw * 0.75, flh * 0.223, flw * 0.219, flh * 0.615)
+local overviewrect = Rectangle(flw * 0.75, flh * 0.285, flw * 0.219, flh * 0.615)
 local overview = Overview(overviewargs, overviewrect)
 
 
@@ -128,7 +129,7 @@ local overview = Overview(overviewargs, overviewrect)
 // Snap (image + video)
 //******************************************************************************
 local snapargs = SnapArgs()
-local snaprect = Rectangle(flw * 0.286, flh * 0.223, flw * 0.445, flh * 0.615)
+local snaprect = Rectangle(flw * 0.286, flh * 0.285, flw * 0.445, flh * 0.615)
 local snap = Snap(snapargs, snaprect)
 
 
