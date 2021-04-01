@@ -55,6 +55,11 @@ class ListboxItem
 		else
 		{
 			text = fe.add_text(name, listbox.rectangle.x, y, listbox.rectangle.width, itemheight)
+					
+			text.red = listbox.color.r
+			text.blue = listbox.color.b
+			text.green = listbox.color.g
+			text.alpha = listbox.color.a
 		}
 		
 		configureText()
@@ -144,6 +149,7 @@ class ListBox
 	align = Align.Left
 	rows = 10
 	charsize = 20
+	color = Color(0, 0, 0, 255) 
 	sel_bgcolor = Color(200, 200, 200, 255)
 	sel_color = Color(255, 255, 0, 255)
 	margin = 10

@@ -37,26 +37,29 @@ function updatePlatform()
 {
 	if (platform != null) platform.visible = false
 	local name = "../showfloor/platforms/" + fe.list.name + ".png"
-	platform = PreserveImage(name, flw * 0.012, flh * 0.021, flw * 0.243, flh * 0.16).update()
+	platform = PreserveImage(name, flw * 0.009, flh * 0.033, flw * 0.239, flh * 0.17).update()
 }
 
 
 //******************************************************************************
 // Listbox
 //******************************************************************************
-local listbox = ListBox(Rectangle(flw * 0.029, flh * 0.2, flw * 0.21, flh * 0.7))
+local listbox = ListBox(Rectangle(flw * 0.018, flh * 0.232, flw * 0.218, flh * 0.662))
 listbox.rows = 22
 listbox.charsize = resize(22)
-listbox.sel_color = Color(255, 40, 40, 255)
-listbox.sel_bgcolor = Color(0, 0, 0, 0)
+listbox.sel_color = Color(0, 0, 0, 255)
+listbox.sel_bgcolor = Color(150, 150, 150, 175)
 listbox.init(0)
 
 
 //******************************************************************************
 // Game count
 //******************************************************************************
-local gamecount = fe.add_text("", flw * 0.029, flh * 0.927, flw * 0.21, flh * 0.025)
-gamecount.charsize = resize(22)
+local gamecount = fe.add_text("", flw * 0.018, flh * 0.94, flw * 0.219, flh * 0.04)
+gamecount.charsize = resize(25)
+gamecount.red = 0
+gamecount.blue = 0
+gamecount.green = 0
 
 function updateGameCount()
 {
@@ -67,13 +70,13 @@ function updateGameCount()
 //******************************************************************************
 // Game logo
 //******************************************************************************
-PreserveArt("wheel", flw * 0.286, flh * 0.05, flw * 0.685, flh * 0.2).update()
+PreserveArt("wheel", flw * 0.325, flh * 0.021, flw * 0.613, flh * 0.205).update()
 
 
 //*****************************************************************************
 // Developper
 //******************************************************************************
-local text = fe.add_text("[Manufacturer]", flw * 0.286, flh * 0.927, flw * 0.207, flh * 0.025)
+local text = fe.add_text("[Manufacturer]", flw * 0.284, flh * 0.949, flw * 0.207, flh * 0.025)
 text.align = Align.Left
 text.charsize = resize(20)
 text.margin = 0
@@ -82,7 +85,7 @@ text.margin = 0
 //*****************************************************************************
 // Genre
 //******************************************************************************
-text = fe.add_text("[Category]", flw * 0.371, flh * 0.927, flw * 0.36, flh * 0.025)
+text = fe.add_text("[Category]", flw * 0.359, flh * 0.949, flw * 0.36, flh * 0.025)
 text.align = Align.Right
 text.charsize = resize(20)
 text.margin = 0
@@ -91,7 +94,7 @@ text.margin = 0
 //*****************************************************************************
 // Players
 //******************************************************************************
-text = fe.add_text("[Players]", flw * 0.774, flh * 0.927, flw * 0.1, flh * 0.025)
+text = fe.add_text("[Players]", flw * 0.79, flh * 0.949, flw * 0.1, flh * 0.025)
 text.align = Align.Left
 text.charsize = resize(20)
 text.margin = 0
@@ -100,7 +103,7 @@ text.margin = 0
 //*****************************************************************************
 // Languages
 //******************************************************************************
-text = fe.add_text("[Language]", flw * 0.81, flh * 0.927, flw * 0.1, flh * 0.025)
+text = fe.add_text("[Language]", flw * 0.825, flh * 0.949, flw * 0.1, flh * 0.025)
 text.charsize = resize(20)
 text.margin = 0
 
@@ -108,7 +111,7 @@ text.margin = 0
 //*****************************************************************************
 // Year
 //******************************************************************************
-text = fe.add_text("[Year]", flw * 0.94, flh * 0.927, flw * 0.03, flh * 0.025)
+text = fe.add_text("[Year]", flw * 0.95, flh * 0.949, flw * 0.03, flh * 0.025)
 text.align = Align.Right
 text.charsize = resize(20)
 text.margin = 0
@@ -118,10 +121,10 @@ text.margin = 0
 // Game Overview
 //******************************************************************************
 local overviewargs = OverviewArgs()
-overviewargs.charsize = resize(20)
+overviewargs.charsize = resize(19)
 overviewargs.controlpath = "../../../Roms/%s/media/controls/%s.png"
 
-local overviewrect = Rectangle(flw * 0.75, flh * 0.285, flw * 0.219, flh * 0.615)
+local overviewrect = Rectangle(flw * 0.767, flh * 0.296, flw * 0.216, flh * 0.595)
 local overview = Overview(overviewargs, overviewrect)
 
 
@@ -129,7 +132,7 @@ local overview = Overview(overviewargs, overviewrect)
 // Snap (image + video)
 //******************************************************************************
 local snapargs = SnapArgs()
-local snaprect = Rectangle(flw * 0.286, flh * 0.285, flw * 0.445, flh * 0.615)
+local snaprect = Rectangle(flw * 0.28, flh * 0.295, flw * 0.442, flh * 0.588)
 local snap = Snap(snapargs, snaprect)
 
 
