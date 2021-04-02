@@ -47,8 +47,8 @@ function updatePlatform()
 local listbox = ListBox(Rectangle(flw * 0.018, flh * 0.232, flw * 0.218, flh * 0.662))
 listbox.rows = 22
 listbox.charsize = resize(22)
-listbox.sel_color = Color(0, 0, 0, 255)
-listbox.sel_bgcolor = Color(150, 150, 150, 175)
+listbox.sel_color = Color(255, 255, 255, 255)
+listbox.sel_bgcolor = Color(0, 100, 220, 150)
 listbox.init(0)
 
 
