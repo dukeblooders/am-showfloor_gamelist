@@ -1,10 +1,13 @@
 //******************************************************************************
 // Modules
 //******************************************************************************
+
+fe.load_module("file");
+
 fe.do_nut("tools.nut")
 fe.do_nut("preserve.nut")
 fe.do_nut("listbox.nut")
-fe.do_nut("overview.nut")
+fe.do_nut("gallery.nut")
 fe.do_nut("snap.nut")
 
 
@@ -67,12 +70,6 @@ function updateGameCount()
 }
 
 
-//******************************************************************************
-// Game logo
-//******************************************************************************
-PreserveArt("wheel", flw * 0.325, flh * 0.021, flw * 0.613, flh * 0.205).update()
-
-
 //*****************************************************************************
 // Developper
 //******************************************************************************
@@ -103,9 +100,31 @@ text.margin = 0
 //*****************************************************************************
 // Languages
 //******************************************************************************
-text = fe.add_text("[Language]", flw * 0.825, flh * 0.949, flw * 0.1, flh * 0.025)
-text.charsize = resize(20)
-text.margin = 0
+local lang1 = PreserveImage("", flw * 0.731, flh * 0.851, flw * 0.027, flh * 0.041)
+local lang2 = PreserveImage("", flw * 0.731, flh * 0.796, flw * 0.027, flh * 0.041)
+
+function updateLanguage(var)
+{
+	local info = fe.game_info(Info.Language, var)
+	local languages = split(info, "/")
+		
+	if (languages.len() == 1)
+	{
+		lang1.file_name = "backgrounds/" + strip(languages[0]) + ".png"
+		lang1.update()
+		
+		lang2.visible = false
+	}
+	else if (languages.len() == 2)
+	{
+		lang1.file_name = "backgrounds/" + strip(languages[1]) + ".png"
+		lang1.update()
+		
+		lang2.file_name = "backgrounds/" + strip(languages[0]) + ".png"
+		lang2.visible = true
+		lang2.update()
+	}
+}
 
 
 //*****************************************************************************
@@ -118,14 +137,42 @@ text.margin = 0
 
 
 //******************************************************************************
-// Game Overview
+// Game Gallery
 //******************************************************************************
-local overviewargs = OverviewArgs()
-overviewargs.charsize = resize(19)
-overviewargs.controlpath = "../../../Roms/%s/media/controls/%s.png"
+local galleryargs = GalleryArgs()
+galleryargs.basepath = "../Roms/%s/media"
+galleryargs.controlfolder = "controls"
+galleryargs.imagefolder = "box"
+galleryargs.wheelfolder = "wheel"
+galleryargs.overview_charsize = resize(19)
 
-local overviewrect = Rectangle(flw * 0.767, flh * 0.296, flw * 0.216, flh * 0.595)
-local overview = Overview(overviewargs, overviewrect)
+local wheelrect = Rectangle(flw * 0.325, flh * 0.021, flw * 0.613, flh * 0.205)
+local galleryrect = Rectangle(flw * 0.766 flh * 0.296, flw * 0.216, flh * 0.595)
+local gallery = Gallery(galleryargs, wheelrect, galleryrect)
+
+
+//******************************************************************************
+// Game Gallery - Info
+//******************************************************************************
+local galleryinfoCurrent = fe.add_text("", flw * 0.819, flh * 0.949, flw * 0.05, flh * 0.025)
+galleryinfoCurrent.align = Align.Right
+galleryinfoCurrent.charsize = resize(20)
+galleryinfoCurrent.margin = 0
+
+local galleryinfo = fe.add_text("/", flw * 0.825, flh * 0.949, flw * 0.1, flh * 0.025)
+galleryinfo.charsize = resize(20)
+galleryinfo.margin = 0
+
+local galleryinfoTotal = fe.add_text("", flw * 0.88, flh * 0.949, flw * 0.05 flh * 0.025)
+galleryinfoTotal.align = Align.Left
+galleryinfoTotal.charsize = resize(20)
+galleryinfoTotal.margin = 0
+
+function updateGalleryInfo()
+{
+	galleryinfoCurrent.msg = gallery.currentindex + 1
+	galleryinfoTotal.msg = gallery.objlist.len()
+}
 
 
 //*****************************************************************************
@@ -146,7 +193,7 @@ function ticks_callback(ttime)
 	current_ttime = ttime
 
 	listbox.scroll()
-	overview.scroll(ttime)
+	if (gallery.scroll(ttime)) updateGalleryInfo()
 	snap.swap(ttime)
 }
 
@@ -156,16 +203,20 @@ function transition_callback(ttype, var, ttime)
 	{
 		case Transition.ToNewSelection:
 			listbox.change(var)
-			overview.reset(var)
+			gallery.reset(var, false)
+			updateGalleryInfo()
 			snap.reset(current_ttime)
+			updateLanguage(var)
 			break
 	
 		case Transition.ToNewList:		
 			updatePlatform()
 			updateGameCount()
 			listbox.change(var)
-			overview.reset(var)
+			gallery.reset(var, true)
+			updateGalleryInfo()
 			snap.reset(current_ttime)
+			updateLanguage(var)
 			break
 			
 		case Transition.FromGame:
