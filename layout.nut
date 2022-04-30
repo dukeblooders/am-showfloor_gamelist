@@ -9,6 +9,7 @@ fe.do_nut("preserve.nut")
 fe.do_nut("listbox.nut")
 fe.do_nut("gallery.nut")
 fe.do_nut("snap.nut")
+fe.do_nut("controls.nut")
 
 
 //******************************************************************************
@@ -20,9 +21,9 @@ local flh = fe.layout.height
 fe.layout.font = "OpenSans-Bold.ttf"
 fe.layout.page_size = 20
 
-function resize(charsize)
+function resize(size)
 {
-	return charsize * flw / 1920 // Calculated from HD screen
+	return size * flw / 1920 // Calculated from HD screen
 }
 
 
@@ -141,7 +142,14 @@ text.margin = 0
 //******************************************************************************
 local galleryargs = GalleryArgs()
 galleryargs.basepath = "../Roms/%s/media"
-galleryargs.controlfolder = "controls"
+galleryargs.controlargs.charsizegroup = resize(28)
+galleryargs.controlargs.charsize = resize(18)
+galleryargs.controlargs.controlfolder = "controls"
+galleryargs.controlargs.ellipsissize = resize(24)
+galleryargs.controlargs.imagepath = "../buttons/%s.png"
+galleryargs.controlargs.imagesize = resize(48)
+galleryargs.controlargs.imagespace = resize(4)
+galleryargs.controlargs.rowspace = resize(8)
 galleryargs.imagefolder = "box"
 galleryargs.wheelfolder = "wheel"
 galleryargs.overview_charsize = resize(19)

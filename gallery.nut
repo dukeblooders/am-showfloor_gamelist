@@ -5,18 +5,34 @@ class GalleryArgs
 {
 	object_order = ["overview", "controls", "image", "wheel"]
 	basepath = ""			// Use %s for current list
-	controlfolder = ""
+	controlargs = null
 	imagefolder = ""
 	wheelfolder = ""
 	overview_align = Align.TopLeft
 	overview_charsize = 20
 	overview_margin = 0
 	scroll_startline = 25				
-	scroll_mindelay = 75
+	scroll_mindelay = 100
 	input_up = "custom1"
 	input_down = "custom2"
 	input_swap = "custom3"
+	
+	constructor()
+	{
+		controlargs = ControlsArgs()
+	}
 }
+
+//******************************************************************************
+// Gallery platform 
+//******************************************************************************
+class GalleryPlatform
+{
+	platform = null
+	imagefiles = null
+	wheelfiles = null
+}
+
 
 //******************************************************************************
 // Gallery object 
@@ -41,9 +57,8 @@ class GalleryObject
 class Gallery
 {
 	args = null
-	line = null; wheel = null; image = null; overview = null; 
-	imagefiles = null
-	wheelfiles = null
+	line = null; wheel = null; image = null; overview = null; controls = null;
+	platforms = null
 	previoustick = 0
 
 	currentindex = 0
@@ -53,7 +68,7 @@ class Gallery
 
 
 	constructor(_args, rectangleWheel, rectangleGallery)
-	{
+	{		
 		args = _args
 	
 		overview = fe.add_text("[Overview]", rectangleGallery.x, rectangleGallery.y, rectangleGallery.width, rectangleGallery.height)
@@ -64,7 +79,8 @@ class Gallery
 		
 		wheel = PreserveImage("", rectangleWheel.x, rectangleWheel.y, rectangleWheel.width, rectangleWheel.height)		
 		image = PreserveImage("", rectangleGallery.x, rectangleGallery.y, rectangleGallery.width, rectangleGallery.height)
-			
+		controls = Controls(args.controlargs, rectangleGallery)		
+		
 		reset(0, true)
 	}
 	
@@ -77,6 +93,12 @@ class Gallery
 	{
 		wheels = []
 		objlist = []
+		
+		if (reload_files) // Group files by platform for multi-plaforms lists
+		{
+			platforms = []
+			readFiles();
+		}
 		
 		local platform = fe.game_info(Info.Extra, var)
 		local name = fe.game_info(Info.Name, var)
@@ -92,9 +114,11 @@ class Gallery
 					break
 					
 				case "controls":
-					local controlpath = format(args.basepath, platform) + "/" + args.controlfolder + "/" + name + ".png"
-					if (doesFileExist(controlpath))
+					local controlpath = format(args.basepath, platform) + "/" + args.controlargs.controlfolder + "/" + name + ".txt"
+					if (doesFileExist(controlpath)) 
 						objlist.push(GalleryObject(i, controlpath))
+					else
+						controls.clear()
 					break
 					
 				case "image":
@@ -143,17 +167,73 @@ class Gallery
 	}
 	
 	
+		
 	//******************************************************************************
-	// Get files
+	// Read files
+	//******************************************************************************
+	
+	function readFiles()
+	{
+		local platform = null
+		local path = null
+		local files = null
+		local platformobj
+		
+		for (local i=0; i<fe.list.size; i++)
+		{
+			platform = fe.game_info(Info.Extra, i)
+			if (getPlatformObj(platform) != null)
+				continue
+			
+			// New platform
+			platformobj = GalleryPlatform()
+			platformobj.platform = platform
+			platformobj.imagefiles = []
+			platformobj.wheelfiles = []
+			platforms.push(platformobj)
+			
+			// Images - Files are grouped by letter to reduce load times
+			path = "../../" + format(args.basepath, platform) + "/" + args.imagefolder
+			files = DirectoryListing(path, false).results
+			
+			for (local i=0; i<255; i++)
+				platformobj.imagefiles.push([])
+			
+			foreach	(file in files)
+				platformobj.imagefiles[file[0]].push(file)
+			
+			// Wheels - Files are grouped by letter to reduce load times
+			path = "../../" + format(args.basepath, platform) + "/" + args.wheelfolder
+			files = DirectoryListing(path, false).results
+			
+			for (local i=0; i<255; i++)
+				platformobj.wheelfiles.push([])
+			
+			foreach	(file in files)
+				platformobj.wheelfiles[file[0]].push(file)
+		}
+	}
+	
+	
+	function getPlatformObj(_platform)
+	{
+		foreach	(platform in platforms)
+			if (platform.platform == _platform)
+				return platform
+			
+		return null	
+	}
+		
+	
+	//******************************************************************************
+	// Get current game files
 	//******************************************************************************
 		
 	function getImages(index, platform, name, reload_files)
 	{
 		local path = format(args.basepath, platform) + "/" + args.imagefolder
-	
-		if (reload_files)
-			imagefiles = readFiles("../../" + path)
-	
+		local imagefiles = getPlatformObj(platform).imagefiles
+
 		for (local i=0; i<imagefiles[name[0]].len(); i++)
 		{
 			local r = regexp(name)
@@ -161,21 +241,19 @@ class Gallery
 			
 			if (c != null)
 			{
-				local obj = GetGalleryObject(index, path, name, imagefiles[name[0]][i])
+				local obj = getGalleryObject(index, path, name, imagefiles[name[0]][i])
 				if (obj == null) continue
 	
 				objlist.push(obj)
 			}
 		}
 	}
-	
-		
+
+
 	function getWheels(index, platform, name, reload_files)
 	{	
 		local path = format(args.basepath, platform) + "/" + args.wheelfolder
-	
-		if (reload_files)
-			wheelfiles = readFiles("../../" + path);
+		local wheelfiles = getPlatformObj(platform).wheelfiles
 		
 		for (local i=0; i<wheelfiles[name[0]].len(); i++)
 		{
@@ -184,7 +262,7 @@ class Gallery
 
 			if (c != null)
 			{
-				local wheel = GetGalleryObject(index, path, name, wheelfiles[name[0]][i])
+				local wheel = getGalleryObject(index, path, name, wheelfiles[name[0]][i])
 				if (wheel == null) continue
 			
 				if (wheels.len() == 0) // Default wheel
@@ -204,21 +282,6 @@ class Gallery
 	}
 	
 	
-	function readFiles(path)
-	{
-		local files = DirectoryListing(path, false).results
-		local values = []	
-		
-		for (local i=0; i<255; i++) // Files are grouped by letter to reduce load times
-			values.push([])
-		
-		foreach	(file in files)
-			values[file[0]].push(file)
-
-		return values	
-	}
-	
-	
 	function isMatchingWheel(index, wheel)
 	{
 		foreach	(obj in objlist)
@@ -231,7 +294,7 @@ class Gallery
 	}
 		
 	
-	function GetGalleryObject(index, path, name, filename)
+	function getGalleryObject(index, path, name, filename)
 	{
 		local obj = GalleryObject(index, path + "/" + filename)
 
@@ -252,7 +315,6 @@ class Gallery
 		
 		return null
 	}
-	
 	
 
 	//******************************************************************************
@@ -275,8 +337,20 @@ class Gallery
 				if (setWheel) setWheelPath(wheels.len() == 0 ? "" : "../../" + wheels[0].path)
 				image.visible = false
 				overview.visible = true
+				controls.clear()
 				
 				resetOverview()
+				break
+				
+			case "controls":
+				if (setWheel)
+				{
+					local index = getWheelIndex(obj)
+					if (index != null) setWheelPath("../../" + index.path)
+				}
+				image.visible = false
+				overview.visible = false
+				controls.reset(obj.path)				
 				break
 				
 			case "wheel":
@@ -291,28 +365,28 @@ class Gallery
 				break
 			
 			default:
-				if (setWheel) setWheelPath("../../" + getWheelIndex(obj).path)
+				if (setWheel)
+				{
+					local index = getWheelIndex(obj)
+					if (index != null) setWheelPath("../../" + index.path)
+				}
 				setImagePath("../../" + obj.path)
 				image.visible = true
 				overview.visible = false
+				controls.clear()
 				break
 		}
 	}
 	
 	
-	
 	function getWheelIndex(obj)
 	{
-		if (obj.pathindex == null)
-			return wheels[0]  // Default wheel
-		else
-		{
+		if (obj.pathindex != null)
 			foreach (wheel in wheels)
 				if (wheel.pathindex == obj.pathindex) // Matching wheel
 					return wheel
-		
-			return wheels[0] // Default wheel	
-		}
+					
+		return wheels.len() == 0 ? null : wheels[0]  // Default wheel
 	}
 	
 	
@@ -364,21 +438,28 @@ class Gallery
 			if (ttime > previoustick + args.scroll_mindelay)
 				if (fe.get_input_state(args.input_up))
 				{
-					overview.first_line_hint = line--
+					if (overview.visible)
+					{
+						if (line > args.scroll_startline)
+							overview.first_line_hint = --line
+					}
+					else if (controls.lines != null)
+						controls.reload(-1)					
+					
 					previoustick = ttime
 				}
 				else if (fe.get_input_state(args.input_down))
 				{
-					overview.first_line_hint = line++
-				
-					if (overview.msg_width == 0)
-					{
-						if (overview.first_line_hint == 0)
-							overview.first_line_hint = -1
-					
-						resetOverview()
+					if (overview.visible)
+					{					
+						overview.first_line_hint = ++line
+						
+						if (overview.msg_width == 0)
+							resetOverview()
 					}
-					
+					else if (controls.lines != null)			
+						controls.reload(1)
+				
 					previoustick = ttime
 				}
 		}
