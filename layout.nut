@@ -19,7 +19,7 @@ local flw = fe.layout.width
 local flh = fe.layout.height
 
 fe.layout.font = "OpenSans-Bold.ttf"
-fe.layout.page_size = 20
+fe.layout.page_size = 22
 
 function resize(size)
 {
@@ -49,7 +49,7 @@ function updatePlatform()
 // Listbox
 //******************************************************************************
 local listbox = ListBox(Rectangle(flw * 0.018, flh * 0.232, flw * 0.218, flh * 0.662))
-listbox.rows = 22
+listbox.rows = fe.layout.page_size
 listbox.charsize = resize(22)
 listbox.sel_color = Color(255, 255, 255, 255)
 listbox.sel_bgcolor = Color(0, 100, 220, 150)
