@@ -443,7 +443,7 @@ class Gallery
 						if (line > args.scroll_startline)
 							overview.first_line_hint = --line
 					}
-					else if (controls.lines != null)
+					else if (args.object_order[objlist[currentindex].orderindex] == "controls" && controls.lines != null)
 						controls.reload(-1)					
 					
 					previoustick = ttime
@@ -457,7 +457,7 @@ class Gallery
 						if (overview.msg_width == 0)
 							resetOverview()
 					}
-					else if (controls.lines != null)			
+					else if (args.object_order[objlist[currentindex].orderindex] == "controls" && controls.lines != null)	
 						controls.reload(1)
 				
 					previoustick = ttime
